@@ -278,6 +278,11 @@ export const translations = {
     'zh-CN': '用户名',
     'zh-TW': '用戶名'
   },
+  'username_or_email': {
+    'en': 'Username or Email',
+    'zh-CN': '用户名或邮箱',
+    'zh-TW': '用戶名或郵箱'
+  },
   'password': {
     'en': 'Password',
     'zh-CN': '密码',

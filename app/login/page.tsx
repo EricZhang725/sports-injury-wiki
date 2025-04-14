@@ -19,6 +19,9 @@ export default function Login() {
   const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
+    // 打印当前session状态用于调试
+    console.log("Session status:", status, session);
+    
     if (status === 'authenticated' && session) {
       console.log("已登录，重定向中...", session);
       const callbackUrl = searchParams?.get('callbackUrl') || '/';
@@ -39,48 +42,28 @@ export default function Login() {
     }
 
     try {
-      console.log("尝试登录...", { username });
+      console.log("尝试使用NextAuth登录...", { username });
       
-      // 直接使用自定义API登录
-      const loginResponse = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: username, // 支持使用邮箱作为用户名
-          password,
-        }),
-      });
-
-      const loginData = await loginResponse.json();
-      
-      if (loginResponse.ok && loginData.success) {
-        console.log("直接API登录成功，重定向中...");
-        // 登录成功后重新加载会话
-        const callbackUrl = searchParams?.get('callbackUrl') || '/';
-        router.push(callbackUrl);
-        return;
-      }
-      
-      // 如果直接API登录失败，尝试使用NextAuth登录
-      console.log("尝试使用NextAuth登录...");
       const res = await signIn('credentials', {
         username,
         password,
         redirect: false,
       });
       
+      console.log("登录响应:", res);
       setDebugInfo({ nextAuthResponse: res });
 
       if (res?.error) {
         console.error("登录失败:", res.error);
-        setError(t('invalid_credentials'));
+        setError(res.error === "CredentialsSignin" 
+          ? t('invalid_credentials') 
+          : t('login_error'));
       } else if (res?.ok) {
         console.log("登录成功，重定向中...");
         const callbackUrl = searchParams?.get('callbackUrl') || '/';
         router.push(callbackUrl);
       } else {
+        console.error("未知登录错误");
         setError(t('login_error'));
       }
     } catch (err) {
@@ -119,7 +102,7 @@ export default function Login() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                {t('username')}
+                {t('username_or_email')}
               </label>
               <div className="mt-1">
                 <input

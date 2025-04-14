@@ -36,20 +36,21 @@ declare module "next-auth" {
 }
 
 export const authOptions: AuthOptions = {
-  debug: process.env.NODE_ENV === 'development',
+  debug: true, // 启用调试
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: 'Credentials',
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         console.log("NextAuth authorize function called with username:", credentials?.username);
         
         if (!credentials?.username || !credentials?.password) {
           console.error("Missing credentials");
-          throw new Error('Please enter username and password');
+          return null;
         }
 
         try {
@@ -69,7 +70,7 @@ export const authOptions: AuthOptions = {
 
           if (!user) {
             console.error("User not found");
-            throw new Error('User not found');
+            return null;
           }
 
           const isValid = await bcrypt.compare(credentials.password, user.password);
@@ -77,7 +78,7 @@ export const authOptions: AuthOptions = {
           
           if (!isValid) {
             console.error("Invalid password");
-            throw new Error('Invalid password');
+            return null;
           }
 
           console.log("User authenticated successfully:", user.username);
@@ -90,7 +91,7 @@ export const authOptions: AuthOptions = {
           };
         } catch (error) {
           console.error("Error in authorize function:", error);
-          throw error;
+          return null;
         }
       }
     })
@@ -99,7 +100,14 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log('SignIn callback called with user:', user?.username || user?.email);
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         console.log('JWT callback - Adding user data to token:', user.username);
