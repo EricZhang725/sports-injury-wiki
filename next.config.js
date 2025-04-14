@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // 禁用Turbopack
-  turbopack: false,
+  // 移除Turbopack配置
+  experimental: {
+    // 如果需要其他实验性功能可以在这里添加
+  },
   async headers() {
     return [
       {
