@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic';
 console.log("NextAuth API route loaded");
 console.log("Current NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
 console.log("Current environment:", process.env.NODE_ENV);
+console.log("Current MONGODB_URI:", process.env.MONGODB_URI?.substring(0, 20) + "...");
 
 // 扩展 session 类型和用户类型
 declare module "next-auth" {
@@ -75,41 +76,59 @@ export const authOptions: AuthOptions = {
         }
 
         try {
-          console.log("Attempting to connect to database...");
+          console.log("====== 认证流程开始 ======");
+          console.log("1. 尝试连接到数据库...");
           
-          // 添加数据库连接超时
-          await withTimeout(dbConnect(), 10000).catch(error => {
-            console.error("Database connection timed out:", error);
-            throw new Error("Database connection timeout");
-          });
-          
-          console.log("Database connected, searching for user...");
+          // 尝试连接数据库，使用改进的dbConnect函数
+          try {
+            await dbConnect();
+            console.log("2. 数据库连接成功，开始搜索用户...");
+          } catch (dbError) {
+            console.error("2. 数据库连接失败:", dbError);
+            throw new Error("Database connection failed: " + (dbError instanceof Error ? dbError.message : String(dbError)));
+          }
 
           // 尝试用用户名查找
-          let user = await User.findOne({ username: credentials.username }).select('+password');
-          
-          // 如果没找到，尝试用邮箱查找
-          if (!user) {
-            user = await User.findOne({ email: credentials.username }).select('+password');
-            console.log("Searching by email, found user:", !!user);
-          } else {
-            console.log("Found user by username");
+          let user;
+          try {
+            user = await User.findOne({ username: credentials.username }).select('+password');
+            if (user) {
+              console.log("3. 通过用户名找到用户");
+            } else {
+              console.log("3. 用户名搜索无结果，尝试通过邮箱搜索");
+              // 如果没找到，尝试用邮箱查找
+              user = await User.findOne({ email: credentials.username }).select('+password');
+              if (user) {
+                console.log("4. 通过邮箱找到用户");
+              } else {
+                console.log("4. 用户不存在");
+              }
+            }
+          } catch (userError) {
+            console.error("查找用户时出错:", userError);
+            throw new Error("User search failed: " + (userError instanceof Error ? userError.message : String(userError)));
           }
 
           if (!user) {
-            console.error("User not found");
+            console.error("用户不存在");
             return null;
           }
 
-          const isValid = await bcrypt.compare(credentials.password, user.password);
-          console.log("Password validation result:", isValid);
-          
-          if (!isValid) {
-            console.error("Invalid password");
-            return null;
+          try {
+            const isValid = await bcrypt.compare(credentials.password, user.password);
+            console.log("5. 密码验证结果:", isValid);
+            
+            if (!isValid) {
+              console.error("密码无效");
+              return null;
+            }
+          } catch (bcryptError) {
+            console.error("密码比对失败:", bcryptError);
+            throw new Error("Password comparison failed: " + (bcryptError instanceof Error ? bcryptError.message : String(bcryptError)));
           }
 
-          console.log("User authenticated successfully:", user.username);
+          console.log("6. 用户认证成功:", user.username);
+          console.log("====== 认证流程结束 ======");
           
           return {
             id: user._id.toString(),
@@ -118,7 +137,9 @@ export const authOptions: AuthOptions = {
             role: user.role
           };
         } catch (error) {
-          console.error("Error in authorize function:", error);
+          console.error("======认证过程中的错误======");
+          console.error(error);
+          console.error("==========================");
           return null;
         }
       }
