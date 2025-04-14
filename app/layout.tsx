@@ -1,11 +1,7 @@
-'use client';
-
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { LanguageProvider } from './context/LanguageContext';
-import Navbar from './components/Navbar';
-import { SessionProvider } from 'next-auth/react';
+import ClientLayout from './ClientLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,14 +18,7 @@ export default function RootLayout({
   return (
     <html lang="zh">
       <body className={inter.className}>
-        <SessionProvider>
-          <LanguageProvider>
-            <Navbar />
-            <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-              {children}
-            </main>
-          </LanguageProvider>
-        </SessionProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

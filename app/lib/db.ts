@@ -43,5 +43,8 @@ export async function connectToDatabase() {
   return cached.conn;
 }
 
+// 为了向后兼容，添加dbConnect别名
+export const dbConnect = connectToDatabase;
+
 // 为了向后兼容，同时提供默认导出
 export default connectToDatabase; 

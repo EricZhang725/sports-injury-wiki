@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/app/lib/db';
+import { dbConnect } from '@/app/lib/db';
 import User from '@/app/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await connectToDatabase();
+    await dbConnect();
 
     // 查找用户
     const user = await User.findOne({ email }).select('+password');
