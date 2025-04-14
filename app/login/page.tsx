@@ -16,18 +16,21 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && session) {
+      console.log("已登录，重定向中...", session);
       const callbackUrl = searchParams?.get('callbackUrl') || '/';
       router.push(callbackUrl);
     }
-  }, [status, router, searchParams]);
+  }, [status, router, searchParams, session]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setDebugInfo(null);
 
     if (!username || !password) {
       setError(t('all_fields_required'));
@@ -36,21 +39,54 @@ export default function Login() {
     }
 
     try {
+      console.log("尝试登录...", { username });
+      
+      // 直接使用自定义API登录
+      const loginResponse = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: username, // 支持使用邮箱作为用户名
+          password,
+        }),
+      });
+
+      const loginData = await loginResponse.json();
+      
+      if (loginResponse.ok && loginData.success) {
+        console.log("直接API登录成功，重定向中...");
+        // 登录成功后重新加载会话
+        const callbackUrl = searchParams?.get('callbackUrl') || '/';
+        router.push(callbackUrl);
+        return;
+      }
+      
+      // 如果直接API登录失败，尝试使用NextAuth登录
+      console.log("尝试使用NextAuth登录...");
       const res = await signIn('credentials', {
         username,
         password,
         redirect: false,
       });
+      
+      setDebugInfo({ nextAuthResponse: res });
 
       if (res?.error) {
+        console.error("登录失败:", res.error);
         setError(t('invalid_credentials'));
       } else if (res?.ok) {
+        console.log("登录成功，重定向中...");
         const callbackUrl = searchParams?.get('callbackUrl') || '/';
         router.push(callbackUrl);
+      } else {
+        setError(t('login_error'));
       }
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('登录错误:', err);
       setError(t('login_error'));
+      setDebugInfo({ error: err instanceof Error ? err.message : String(err) });
     } finally {
       setLoading(false);
     }
@@ -142,6 +178,15 @@ export default function Login() {
               </div>
             </div>
           </div>
+          
+          {debugInfo && (
+            <div className="mt-6 text-xs text-gray-500 border-t pt-4">
+              <h3 className="font-bold mb-2">调试信息:</h3>
+              <pre className="overflow-auto max-h-40">
+                {JSON.stringify(debugInfo, null, 2)}
+              </pre>
+            </div>
+          )}
         </div>
       </div>
     </div>
