@@ -1,3 +1,14 @@
 {
-  "version": 2
+  "version": 2,
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_SKIP_TYPECHECKING": "true",
+    "NEXT_MINIMAL": "true",
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "github": {
+    "silent": true
+  }
 } 

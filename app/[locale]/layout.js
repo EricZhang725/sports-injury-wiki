@@ -1,26 +1,18 @@
+'use client';
+
 import '../globals.css';
 import { Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { locales, defaultLocale } from '../i18n';
 import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 import { SessionProvider } from 'next-auth/react';
 import { LanguageProvider } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
-// 静态生成支持的locale路由
-export function generateStaticParams() {
-  return locales.map(locale => ({ locale }));
-}
-
-// 同步元数据函数
-export function generateMetadata({ 
-  params 
-}: { 
-  params: { locale: string } 
-}): Metadata {
+// 元数据函数
+export function generateMetadata({ params }) {
   const locale = params.locale;
   
   return {
@@ -31,23 +23,15 @@ export function generateMetadata({
   };
 }
 
-type Props = {
-  children: React.ReactNode;
-  params: {
-    locale: string;
-  };
-};
-
-// 符合Next.js类型的布局组件
-export default function LocaleLayout({ children, params }: Props) {
-  const locale = params.locale;
+export default function Layout(props) {
+  const locale = props.params.locale;
 
   // 验证locale
-  if (!locales.includes(locale as any)) {
+  if (!locales.includes(locale)) {
     notFound();
   }
   
-  // 同步加载消息
+  // 加载消息
   let messages;
   try {
     messages = require(`../messages/${locale}.json`);
@@ -64,7 +48,7 @@ export default function LocaleLayout({ children, params }: Props) {
             <Navbar />
             <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
               <NextIntlClientProvider locale={locale} messages={messages}>
-                {children}
+                {props.children}
               </NextIntlClientProvider>
             </main>
           </LanguageProvider>

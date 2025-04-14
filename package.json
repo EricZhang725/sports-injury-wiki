@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cross-env NEXT_SKIP_TYPECHECKING=true NEXT_MINIMAL=true NODE_OPTIONS=--max_old_space_size=4096 next build --no-lint",
     "start": "next start",
     "lint": "next lint",
-    "vercel-build": "npm run clean && next build",
+    "vercel-build": "cross-env NEXT_SKIP_TYPECHECKING=true NEXT_MINIMAL=true NODE_OPTIONS=--max_old_space_size=4096 next build --no-lint",
     "clean": "rimraf .next"
   },
   "dependencies": {

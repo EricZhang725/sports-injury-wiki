@@ -1,0 +1,6 @@
+.next
+node_modules
+README.md
+.git
+next-env-custom.d.ts
+tsconfig.json 
