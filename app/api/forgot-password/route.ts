@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../lib/db';
+import dbConnect from '../../lib/db';
 import User from '../../models/User';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
+    await dbConnect();
 
     const { email } = await request.json();
 

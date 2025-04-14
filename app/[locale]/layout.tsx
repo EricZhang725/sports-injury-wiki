@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { locales, defaultLocale } from '../i18n';
 import { notFound } from 'next/navigation';
-import Providers from '../providers';
+import ClientLayout from './client-layout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -11,7 +11,7 @@ export function generateStaticParams() {
   return locales.map(locale => ({ locale }));
 }
 
-export async function generateMetadata({
+export function generateMetadata({
   params: { locale }
 }: {
   params: { locale: string };
@@ -22,7 +22,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function LocaleLayout({
+export default function LocaleLayout({
   children,
   params: { locale }
 }: {
@@ -37,21 +37,21 @@ export default async function LocaleLayout({
   // 加载语言文件
   let messages;
   try {
-    messages = (await import(`../messages/${locale}.json`)).default;
+    messages = require(`../messages/${locale}.json`);
   } catch (error) {
     console.error(`Failed to load messages for ${locale}`, error);
     // 回退到默认语言
-    messages = (await import(`../messages/${defaultLocale}.json`)).default;
+    messages = require(`../messages/${defaultLocale}.json`);
   }
 
   return (
     <html lang={locale}>
       <body className={inter.className}>
-        <Providers>
+        <ClientLayout>
           <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
           </NextIntlClientProvider>
-        </Providers>
+        </ClientLayout>
       </body>
     </html>
   );
