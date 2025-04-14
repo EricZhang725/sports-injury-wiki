@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sports_injury_wiki';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
@@ -18,7 +18,7 @@ if (!cached) {
 /**
  * 连接到MongoDB数据库
  */
-export async function dbConnect() {
+export async function connectToDatabase() {
   if (cached.conn) {
     return cached.conn;
   }
@@ -28,9 +28,7 @@ export async function dbConnect() {
       bufferCommands: false,
     };
 
-    console.log('Connecting to MongoDB:', MONGODB_URI);
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('Connected to MongoDB successfully');
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
       return mongoose;
     });
   }
@@ -39,12 +37,11 @@ export async function dbConnect() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    console.error('MongoDB connection error:', e);
     throw e;
   }
 
   return cached.conn;
 }
 
-// Also export as default for backward compatibility
-export default dbConnect; 
+// 为了向后兼容，同时提供默认导出
+export default connectToDatabase; 

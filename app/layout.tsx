@@ -1,31 +1,35 @@
+'use client';
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Providers } from './providers';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
+import { SessionProvider } from 'next-auth/react';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Sports Injury Wiki',
-  description: 'Your comprehensive guide to sports injuries, treatments, and prevention',
+  title: '运动损伤百科',
+  description: '专业的运动损伤预防、治疗和康复知识平台',
 };
 
-// 简单布局，真正的应用会被i18n的[locale]布局替代
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html>
+    <html lang="zh">
       <body className={inter.className}>
-        <Providers>
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">
-            {children}
-          </main>
-        </Providers>
+        <SessionProvider>
+          <LanguageProvider>
+            <Navbar />
+            <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+              {children}
+            </main>
+          </LanguageProvider>
+        </SessionProvider>
       </body>
     </html>
   );
