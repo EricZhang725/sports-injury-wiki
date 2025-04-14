@@ -30,3 +30,34 @@
     "login": "登入失敗，請檢查您的用戶名和密碼。"
   }
 } 
+  "home": {
+    "title": "運動損傷百科",
+    "subtitle": "專業的運動損傷預防、治療和康復知識平台",
+    "sections": {
+      "prevention": {
+        "title": "運動損傷預防",
+        "description": "了解如何通過正確的熱身、訓練技巧和裝備使用來預防常見的運動損傷。"
+      },
+      "rehabilitation": {
+        "title": "專業康復指導",
+        "description": "獲取專業的康復訓練計劃和建議，幫助您從運動損傷中恢復並重返運動場。"
+      }
+    },
+    "buttons": {
+      "community": "進入社區討論",
+      "details": "查看詳情"
+    }
+  },
+  "navigation": {
+    "home": "首頁",
+    "community": "社區",
+    "profile": "個人中心",
+    "admin": "管理後台",
+    "login": "登入",
+    "register": "註冊",
+    "logout": "登出"
+  },
+  "errors": {
+    "login": "登入失敗，請檢查您的用戶名和密碼。"
+  }
+} 

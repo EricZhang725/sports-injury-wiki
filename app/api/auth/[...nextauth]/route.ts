@@ -78,7 +78,7 @@ export const authOptions: AuthOptions = {
           console.log("Attempting to connect to database...");
           
           // 添加数据库连接超时
-          await withTimeout(dbConnect(), 5000).catch(error => {
+          await withTimeout(dbConnect(), 10000).catch(error => {
             console.error("Database connection timed out:", error);
             throw new Error("Database connection timeout");
           });

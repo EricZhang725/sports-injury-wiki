@@ -30,3 +30,34 @@
     "login": "Login failed. Please check your credentials."
   }
 } 
+  "home": {
+    "title": "Sports Injury Wiki",
+    "subtitle": "A professional platform for sports injury prevention and rehabilitation",
+    "sections": {
+      "prevention": {
+        "title": "Injury Prevention",
+        "description": "Learn how to prevent common sports injuries through proper warm-up, training techniques and equipment use."
+      },
+      "rehabilitation": {
+        "title": "Rehabilitation Guide",
+        "description": "Get professional rehabilitation training plans and advice to help you recover from sports injuries and return to the field."
+      }
+    },
+    "buttons": {
+      "community": "Enter Community",
+      "details": "View Details"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "community": "Community",
+    "profile": "Profile",
+    "admin": "Admin Panel",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "errors": {
+    "login": "Login failed. Please check your credentials."
+  }
+} 

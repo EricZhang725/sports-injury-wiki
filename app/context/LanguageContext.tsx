@@ -1218,3 +1218,8 @@ export function useLanguage() {
   }
   return context;
 } 
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+} 

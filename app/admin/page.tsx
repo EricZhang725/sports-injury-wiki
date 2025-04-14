@@ -85,3 +85,20 @@ export default function AdminPanel() {
     </div>
   );
 } 
+                }`}
+              >
+                消息管理
+              </button>
+            </nav>
+          </div>
+
+          {/* 标签页内容 */}
+          <div>
+            {activeTab === 'users' && <AdminUserManager />}
+            {activeTab === 'messages' && <AdminMessages />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 

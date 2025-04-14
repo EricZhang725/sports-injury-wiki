@@ -31,8 +31,7 @@ export default function Login() {
   }, [searchParams, t]);
 
   useEffect(() => {
-    // 打印当前session状态用于调试
-    console.log("Session status:", status, session);
+    // 打印当前session状态用于调�?    console.log("Session status:", status, session);
     
     if (status === 'authenticated' && session) {
       console.log("已登录，重定向中...", session);
@@ -74,7 +73,7 @@ export default function Login() {
             ? t('invalid_credentials') 
             : t('login_error'));
         } else if (res?.ok) {
-          console.log("登录成功，重定向中...");
+          console.log("登录成功，重定向�?..");
           const callbackUrl = searchParams?.get('callbackUrl') || '/';
           router.push(callbackUrl);
         } else {
@@ -83,7 +82,7 @@ export default function Login() {
         }
       } catch (fetchError) {
         console.error('NextAuth 获取错误:', fetchError);
-        setError('无法连接到认证服务器。请检查网络连接后重试。');
+        setError('无法连接到认证服务器。请检查网络连接后重试�?);
         setDebugInfo({ fetchError: fetchError instanceof Error ? fetchError.message : String(fetchError) });
       }
     } catch (err) {
@@ -191,7 +190,7 @@ export default function Login() {
               <div className="overflow-auto max-h-40">
                 <p><strong>环境:</strong> {process.env.NODE_ENV}</p>
                 <p><strong>NextAuth URL:</strong> {process.env.NEXT_PUBLIC_BASE_URL}</p>
-                <p><strong>会话状态:</strong> {status}</p>
+                <p><strong>会话状�?</strong> {status}</p>
                 {debugInfo && (
                   <pre className="mt-2 bg-gray-100 p-2 rounded">
                     {JSON.stringify(debugInfo, null, 2)}

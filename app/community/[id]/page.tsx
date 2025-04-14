@@ -236,3 +236,52 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     </div>
   );
 } 
+                </button>
+              </form>
+            ) : (
+              <div className="mb-6 text-center">
+                <p className="text-gray-600">请登录后发表评论</p>
+                <button
+                  onClick={() => router.push('/login')}
+                  className="text-indigo-600 hover:text-indigo-500 mt-2"
+                >
+                  登录
+                </button>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r">
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {post.comments.map((comment) => (
+                <div key={comment._id} className="border-b border-gray-200 pb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-gray-800">{comment.user.username}</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-500">
+                        {new Date(comment.createdAt).toLocaleDateString()}
+                      </span>
+                      {(session?.user.id === comment.user._id || session?.user.id === post.author._id) && (
+                        <button
+                          onClick={() => handleDeleteComment(comment._id)}
+                          className="text-red-600 hover:text-red-800 text-sm"
+                        >
+                          删除
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-gray-600">{comment.content}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 

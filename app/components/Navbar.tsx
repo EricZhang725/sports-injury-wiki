@@ -336,3 +336,27 @@ export default function Navbar() {
     </nav>
   );
 } 
+            </>
+          ) : (
+            <div className="pt-2 pb-1 flex flex-col space-y-2">
+              <Link 
+                href="/login" 
+                className="btn btn-outline w-full justify-center"
+                onClick={() => setIsOpen(false)}
+              >
+                {t('login')}
+              </Link>
+              <Link 
+                href="/register" 
+                className="btn btn-primary w-full justify-center"
+                onClick={() => setIsOpen(false)}
+              >
+                {t('register')}
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+} 

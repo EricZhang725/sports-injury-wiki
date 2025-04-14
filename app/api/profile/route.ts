@@ -107,3 +107,11 @@ export async function PUT(request: Request) {
     );
   }
 } 
+  } catch (error) {
+    console.error('更新用户资料失败:', error);
+    return NextResponse.json(
+      { error: '服务器错误，请稍后再试' },
+      { status: 500 }
+    );
+  }
+} 

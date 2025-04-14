@@ -133,3 +133,79 @@ const Post = (mongoose.models.Post as IPostModel) ||
   mongoose.model<IPost, IPostModel>('Post', postSchema);
 
 export default Post; 
+  },
+  tags: [{
+    type: String,
+    trim: true
+  }],
+  comments: [commentSchema],
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  views: {
+    type: Number,
+    default: 0
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+}, {
+  timestamps: true
+});
+
+// 创建索引
+postSchema.index({ title: 'text', content: 'text' });
+postSchema.index({ author: 1, createdAt: -1 });
+postSchema.index({ tags: 1 });
+
+// 更新时自动更新 updatedAt
+postSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
+
+// 添加删除评论的方法
+postSchema.methods.deleteComment = async function(commentId: string, userId: string) {
+  const comment = this.comments.id(commentId);
+  if (!comment) {
+    throw new Error('Comment does not exist');
+  }
+  
+  // 检查是否是评论作者或帖子作者
+  if (comment.user.toString() !== userId && this.author.toString() !== userId) {
+    throw new Error('You do not have permission to delete this comment');
+  }
+  
+  // 使用 Mongoose 的 pull 方法删除评论
+  this.comments.pull(commentId);
+  await this.save();
+  return this;
+};
+
+// 添加删除帖子的静态方法
+postSchema.statics.deletePost = async function(postId: string, userId: string) {
+  const post = await this.findById(postId);
+  if (!post) {
+    throw new Error('Post does not exist');
+  }
+  
+  // 检查是否是帖子作者
+  if (post.author.toString() !== userId) {
+    throw new Error('You do not have permission to delete this post');
+  }
+  
+  await this.findByIdAndDelete(postId);
+  return post;
+};
+
+// Check if the model exists to avoid overwriting it
+const Post = (mongoose.models.Post as IPostModel) || 
+  mongoose.model<IPost, IPostModel>('Post', postSchema);
+
+export default Post; 

@@ -194,3 +194,20 @@ export default function Register() {
     </div>
   );
 } 
+          <div className="mt-6">
+            <div className="relative">
+              <div className="flex justify-center text-sm">
+                <Link 
+                  href="/login"
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
+                  {t('already_registered')}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 

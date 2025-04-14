@@ -221,3 +221,103 @@ export default function InjuriesPage() {
     </div>
   );
 }
+              {t('search_results_count').replace('{count}', filteredInjuries.length.toString())}
+            </p>
+          </div>
+        )}
+
+        {/* Display injuries */}
+        {filteredInjuries.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl shadow-sm max-w-md mx-auto">
+            <div className="text-gray-400 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-gray-500 text-lg">{t('no_injuries_found')}</p>
+            <button 
+              className="mt-4 btn btn-outline" 
+              onClick={() => {setSearchTerm(''); setSelectedCategory(null);}}
+            >
+              {t('clear_filters')}
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredInjuries.map(injury => (
+              <div key={injury.id}>
+                <InjuryCard
+                  id={injury.id}
+                  titleKey={injury.titleKey}
+                  imagePath={injury.imagePath}
+                  category={injury.category}
+                  expanded={expandedInjuries[injury.id]}
+                  onClick={() => toggleInjuryExpansion(injury.id)}
+                />
+                
+                {expandedInjuries[injury.id] && (
+                  <div className="mt-4 bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h3 className="font-medium text-lg mb-3 text-gray-800 flex items-center">
+                      <span className="w-1 h-6 bg-primary-500 rounded-full inline-block mr-2"></span>
+                      {t('symptoms')}
+                    </h3>
+                    <ul className="list-disc pl-5 mb-5 space-y-1 text-gray-600">
+                      {injury.symptoms[currentLang].map((symptom, index) => (
+                        <li key={index}>{symptom}</li>
+                      ))}
+                    </ul>
+
+                    <h3 className="font-medium text-lg mb-3 text-gray-800 flex items-center">
+                      <span className="w-1 h-6 bg-accent-500 rounded-full inline-block mr-2"></span>
+                      {t('acute_treatment')}
+                    </h3>
+                    <ul className="list-disc pl-5 mb-5 space-y-1 text-gray-600">
+                      {injury.acuteTreatment[currentLang].map((treatment, index) => (
+                        <li key={index}>{treatment}</li>
+                      ))}
+                    </ul>
+
+                    <h3 className="font-medium text-lg mb-3 text-gray-800 flex items-center">
+                      <span className="w-1 h-6 bg-secondary-500 rounded-full inline-block mr-2"></span>
+                      {t('prevention')}
+                    </h3>
+                    <ul className="list-disc pl-5 mb-5 space-y-1 text-gray-600">
+                      {injury.prevention[currentLang].map((prevention, index) => (
+                        <li key={index}>{prevention}</li>
+                      ))}
+                    </ul>
+
+                    {injury.references && injury.references[currentLang] && injury.references[currentLang].length > 0 && (
+                      <>
+                        <h3 className="font-medium text-lg mb-3 text-gray-800 flex items-center">
+                          <span className="w-1 h-6 bg-gray-500 rounded-full inline-block mr-2"></span>
+                          {t('references')}
+                        </h3>
+                        <ul className="list-disc pl-5 space-y-1 text-gray-600 text-sm">
+                          {injury.references[currentLang].map((reference, index) => (
+                            <li key={index}>
+                              {reference}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                    
+                    <div className="mt-6 text-center">
+                      <button 
+                        onClick={() => toggleInjuryExpansion(injury.id)}
+                        className="btn btn-outline btn-sm"
+                      >
+                        {t('collapse')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

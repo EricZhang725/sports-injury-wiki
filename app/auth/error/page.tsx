@@ -15,7 +15,7 @@ export default function AuthError() {
     
     setError(errorParam);
     
-    // 记录错误和调试信息
+    // 记录错误和调试信�?
     if (errorParam) {
       console.error('Authentication error:', errorParam);
       if (errorDesc) {
@@ -25,7 +25,7 @@ export default function AuthError() {
       // 存储调试信息
       setDebugInfo({
         error: errorParam,
-        description: errorDesc || '无附加描述',
+        description: errorDesc || '无附加描�?,
         timestamp: new Date().toISOString(),
         url: window.location.href
       });
@@ -34,31 +34,31 @@ export default function AuthError() {
   
   const getErrorMessage = (errorCode: string | null) => {
     if (!errorCode) {
-      return '身份验证过程中发生未知错误。请重试或联系管理员。';
+      return '身份验证过程中发生未知错误。请重试或联系管理员�?;
     }
     
     switch (errorCode) {
       case 'CredentialsSignin':
-        return '用户名或密码不正确。请检查您的凭据并重试。';
+        return '用户名或密码不正确。请检查您的凭据并重试�?;
       case 'SessionRequired':
-        return '您需要登录才能访问此页面。';
+        return '您需要登录才能访问此页面�?;
       case 'AccessDenied':
-        return '您没有权限访问此页面。';
+        return '您没有权限访问此页面�?;
       case 'CallbackRouteError':
-        return '登录过程中出现问题。请重试。';
+        return '登录过程中出现问题。请重试�?;
       case 'OAuthAccountNotLinked':
-        return '此电子邮件已存在于系统中。请使用另一个登录方法。';
+        return '此电子邮件已存在于系统中。请使用另一个登录方法�?;
       case 'EmailSignin':
-        return '发送登录链接时出错。请检查您的电子邮件并重试。';
+        return '发送登录链接时出错。请检查您的电子邮件并重试�?;
       case 'Configuration':
-        return '服务器配置错误。请联系管理员。';
+        return '服务器配置错误。请联系管理员�?;
       case 'CLIENT_FETCH_ERROR':
-        return '无法连接到认证服务器。请检查您的网络连接并重试。';
+        return '无法连接到认证服务器。请检查您的网络连接并重试�?;
       case 'undefined':
       case undefined:
-        return '身份验证服务器暂时不可用。请稍后再试或联系管理员。';
+        return '身份验证服务器暂时不可用。请稍后再试或联系管理员�?;
       default:
-        return '身份验证过程中发生错误。请重试或联系管理员。';
+        return '身份验证过程中发生错误。请重试或联系管理员�?;
     }
   };
   
