@@ -10,6 +10,8 @@ export const dynamic = 'force-dynamic';
 
 // 帮助调试
 console.log("NextAuth API route loaded");
+console.log("Current NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
+console.log("Current environment:", process.env.NODE_ENV);
 
 // 扩展 session 类型和用户类型
 declare module "next-auth" {
@@ -35,6 +37,25 @@ declare module "next-auth" {
   }
 }
 
+// 添加超时处理的函数
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`操作超时 (${timeoutMs}ms)`));
+    }, timeoutMs);
+
+    promise
+      .then(value => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(error => {
+        clearTimeout(timer);
+        reject(error);
+      });
+  });
+};
+
 export const authOptions: AuthOptions = {
   debug: true, // 启用调试
   providers: [
@@ -42,7 +63,7 @@ export const authOptions: AuthOptions = {
       id: "credentials",
       name: 'Credentials',
       credentials: {
-        username: { label: "Username", type: "text" },
+        username: { label: "Username or Email", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
@@ -54,7 +75,14 @@ export const authOptions: AuthOptions = {
         }
 
         try {
-          await dbConnect();
+          console.log("Attempting to connect to database...");
+          
+          // 添加数据库连接超时
+          await withTimeout(dbConnect(), 5000).catch(error => {
+            console.error("Database connection timed out:", error);
+            throw new Error("Database connection timeout");
+          });
+          
           console.log("Database connected, searching for user...");
 
           // 尝试用用户名查找
@@ -135,6 +163,34 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: '/login',
     error: '/auth/error',
+  },
+  // 增加超时设置
+  theme: {
+    colorScheme: "light",
+  },
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    },
+  },
+  logger: {
+    error(code, ...message) {
+      console.error('NextAuth error:', code, ...message);
+    },
+    warn(code, ...message) {
+      console.warn('NextAuth warning:', code, ...message);
+    },
+    debug(code, ...message) {
+      if (process.env.NEXTAUTH_DEBUG === 'true') {
+        console.log('NextAuth debug:', code, ...message);
+      }
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

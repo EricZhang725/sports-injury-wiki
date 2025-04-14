@@ -18,6 +18,18 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
 
+  // 获取URL中的错误参数
+  useEffect(() => {
+    const urlError = searchParams?.get('error');
+    if (urlError) {
+      console.error("URL错误参数:", urlError);
+      setError(urlError === "CredentialsSignin" 
+        ? t('invalid_credentials') 
+        : t('login_error'));
+      setDebugInfo({ urlError });
+    }
+  }, [searchParams, t]);
+
   useEffect(() => {
     // 打印当前session状态用于调试
     console.log("Session status:", status, session);
@@ -44,27 +56,35 @@ export default function Login() {
     try {
       console.log("尝试使用NextAuth登录...", { username });
       
-      const res = await signIn('credentials', {
-        username,
-        password,
-        redirect: false,
-      });
-      
-      console.log("登录响应:", res);
-      setDebugInfo({ nextAuthResponse: res });
+      // 使用try-catch包装signIn调用，以捕获网络错误
+      try {
+        const res = await signIn('credentials', {
+          username,
+          password,
+          redirect: false,
+          callbackUrl: '/',
+        });
+        
+        console.log("登录响应:", res);
+        setDebugInfo({ nextAuthResponse: res });
 
-      if (res?.error) {
-        console.error("登录失败:", res.error);
-        setError(res.error === "CredentialsSignin" 
-          ? t('invalid_credentials') 
-          : t('login_error'));
-      } else if (res?.ok) {
-        console.log("登录成功，重定向中...");
-        const callbackUrl = searchParams?.get('callbackUrl') || '/';
-        router.push(callbackUrl);
-      } else {
-        console.error("未知登录错误");
-        setError(t('login_error'));
+        if (res?.error) {
+          console.error("登录失败:", res.error);
+          setError(res.error === "CredentialsSignin" 
+            ? t('invalid_credentials') 
+            : t('login_error'));
+        } else if (res?.ok) {
+          console.log("登录成功，重定向中...");
+          const callbackUrl = searchParams?.get('callbackUrl') || '/';
+          router.push(callbackUrl);
+        } else {
+          console.error("未知登录错误");
+          setError(t('login_error'));
+        }
+      } catch (fetchError) {
+        console.error('NextAuth 获取错误:', fetchError);
+        setError('无法连接到认证服务器。请检查网络连接后重试。');
+        setDebugInfo({ fetchError: fetchError instanceof Error ? fetchError.message : String(fetchError) });
       }
     } catch (err) {
       console.error('登录错误:', err);
@@ -91,6 +111,9 @@ export default function Login() {
             <h2 className="text-center text-3xl font-extrabold text-gray-900">
               {t('login')}
             </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              {t('login_subtitle')}
+            </p>
           </div>
           
           {error && (
@@ -162,12 +185,19 @@ export default function Login() {
             </div>
           </div>
           
-          {debugInfo && (
+          {(debugInfo || process.env.NODE_ENV === 'development') && (
             <div className="mt-6 text-xs text-gray-500 border-t pt-4">
               <h3 className="font-bold mb-2">调试信息:</h3>
-              <pre className="overflow-auto max-h-40">
-                {JSON.stringify(debugInfo, null, 2)}
-              </pre>
+              <div className="overflow-auto max-h-40">
+                <p><strong>环境:</strong> {process.env.NODE_ENV}</p>
+                <p><strong>NextAuth URL:</strong> {process.env.NEXT_PUBLIC_BASE_URL}</p>
+                <p><strong>会话状态:</strong> {status}</p>
+                {debugInfo && (
+                  <pre className="mt-2 bg-gray-100 p-2 rounded">
+                    {JSON.stringify(debugInfo, null, 2)}
+                  </pre>
+                )}
+              </div>
             </div>
           )}
         </div>

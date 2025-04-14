@@ -7,18 +7,36 @@ import Link from 'next/link';
 export default function AuthError() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   
   useEffect(() => {
     const errorParam = searchParams?.get('error');
+    const errorDesc = searchParams?.get('error_description');
+    
     setError(errorParam);
     
-    // 记录错误
+    // 记录错误和调试信息
     if (errorParam) {
       console.error('Authentication error:', errorParam);
+      if (errorDesc) {
+        console.error('Error description:', errorDesc);
+      }
+      
+      // 存储调试信息
+      setDebugInfo({
+        error: errorParam,
+        description: errorDesc || '无附加描述',
+        timestamp: new Date().toISOString(),
+        url: window.location.href
+      });
     }
   }, [searchParams]);
   
-  const getErrorMessage = (errorCode: string) => {
+  const getErrorMessage = (errorCode: string | null) => {
+    if (!errorCode) {
+      return '身份验证过程中发生未知错误。请重试或联系管理员。';
+    }
+    
     switch (errorCode) {
       case 'CredentialsSignin':
         return '用户名或密码不正确。请检查您的凭据并重试。';
@@ -34,6 +52,11 @@ export default function AuthError() {
         return '发送登录链接时出错。请检查您的电子邮件并重试。';
       case 'Configuration':
         return '服务器配置错误。请联系管理员。';
+      case 'CLIENT_FETCH_ERROR':
+        return '无法连接到认证服务器。请检查您的网络连接并重试。';
+      case 'undefined':
+      case undefined:
+        return '身份验证服务器暂时不可用。请稍后再试或联系管理员。';
       default:
         return '身份验证过程中发生错误。请重试或联系管理员。';
     }
@@ -52,12 +75,12 @@ export default function AuthError() {
           <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
             <strong className="font-bold">错误:</strong>
             <span className="block sm:inline ml-2">
-              {error ? getErrorMessage(error) : '未知错误'}
+              {getErrorMessage(error)}
             </span>
             
             {error && (
               <div className="mt-2 text-sm text-gray-600">
-                错误代码: {error}
+                错误代码: {error === 'undefined' ? '服务器通信错误' : error}
               </div>
             )}
           </div>
@@ -77,6 +100,15 @@ export default function AuthError() {
               返回首页
             </Link>
           </div>
+          
+          {debugInfo && process.env.NODE_ENV === 'development' && (
+            <div className="mt-6 p-3 text-xs bg-gray-100 rounded-md">
+              <h3 className="font-bold mb-2">调试信息:</h3>
+              <pre className="overflow-auto max-h-40">
+                {JSON.stringify(debugInfo, null, 2)}
+              </pre>
+            </div>
+          )}
         </div>
       </div>
     </div>
