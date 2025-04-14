@@ -18,11 +18,11 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
 
-  // 获取URL中的错误参数
+  // Get error parameter from URL
   useEffect(() => {
     const urlError = searchParams?.get('error');
     if (urlError) {
-      console.error("URL错误参数:", urlError);
+      console.error("URL error parameter:", urlError);
       setError(urlError === "CredentialsSignin" 
         ? t('invalid_credentials') 
         : t('login_error'));
@@ -31,10 +31,11 @@ export default function Login() {
   }, [searchParams, t]);
 
   useEffect(() => {
-    // 打印当前session状态用于调�?    console.log("Session status:", status, session);
+    // Print current session status for debugging
+    console.log("Session status:", status, session);
     
     if (status === 'authenticated' && session) {
-      console.log("已登录，重定向中...", session);
+      console.log("Logged in, redirecting...", session);
       const callbackUrl = searchParams?.get('callbackUrl') || '/';
       router.push(callbackUrl);
     }
@@ -53,9 +54,9 @@ export default function Login() {
     }
 
     try {
-      console.log("尝试使用NextAuth登录...", { username });
+      console.log("Attempting to login with NextAuth...", { username });
       
-      // 使用try-catch包装signIn调用，以捕获网络错误
+      // Use try-catch to wrap signIn call to catch network errors
       try {
         const res = await signIn('credentials', {
           username,
@@ -64,29 +65,29 @@ export default function Login() {
           callbackUrl: '/',
         });
         
-        console.log("登录响应:", res);
+        console.log("Login response:", res);
         setDebugInfo({ nextAuthResponse: res });
 
         if (res?.error) {
-          console.error("登录失败:", res.error);
+          console.error("Login failed:", res.error);
           setError(res.error === "CredentialsSignin" 
             ? t('invalid_credentials') 
             : t('login_error'));
         } else if (res?.ok) {
-          console.log("登录成功，重定向�?..");
+          console.log("Login successful, redirecting...");
           const callbackUrl = searchParams?.get('callbackUrl') || '/';
           router.push(callbackUrl);
         } else {
-          console.error("未知登录错误");
+          console.error("Unknown login error");
           setError(t('login_error'));
         }
       } catch (fetchError) {
-        console.error('NextAuth 获取错误:', fetchError);
-        setError('无法连接到认证服务器。请检查网络连接后重试�?);
+        console.error('NextAuth fetch error:', fetchError);
+        setError(t('connection_error'));
         setDebugInfo({ fetchError: fetchError instanceof Error ? fetchError.message : String(fetchError) });
       }
     } catch (err) {
-      console.error('登录错误:', err);
+      console.error('Login error:', err);
       setError(t('login_error'));
       setDebugInfo({ error: err instanceof Error ? err.message : String(err) });
     } finally {
@@ -135,7 +136,7 @@ export default function Login() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -153,7 +154,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -186,11 +187,11 @@ export default function Login() {
           
           {(debugInfo || process.env.NODE_ENV === 'development') && (
             <div className="mt-6 text-xs text-gray-500 border-t pt-4">
-              <h3 className="font-bold mb-2">调试信息:</h3>
+              <h3 className="font-bold mb-2">{t('debug_info')}</h3>
               <div className="overflow-auto max-h-40">
-                <p><strong>环境:</strong> {process.env.NODE_ENV}</p>
-                <p><strong>NextAuth URL:</strong> {process.env.NEXT_PUBLIC_BASE_URL}</p>
-                <p><strong>会话状�?</strong> {status}</p>
+                <p><strong>{t('environment')}:</strong> {process.env.NODE_ENV}</p>
+                <p><strong>{t('nextauth_url')}:</strong> {process.env.NEXT_PUBLIC_BASE_URL}</p>
+                <p><strong>{t('session_status')}:</strong> {status}</p>
                 {debugInfo && (
                   <pre className="mt-2 bg-gray-100 p-2 rounded">
                     {JSON.stringify(debugInfo, null, 2)}

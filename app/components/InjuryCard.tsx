@@ -55,7 +55,7 @@ const InjuryCard = ({
         )}
         <div className="absolute top-2 right-2">
           <span className="badge badge-secondary text-xs font-medium py-1 px-2">
-            {t(category) || category}
+            {t(`${category}_category`) || category}
           </span>
         </div>
       </div>

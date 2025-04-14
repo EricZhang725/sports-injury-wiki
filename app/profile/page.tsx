@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/app/components/Navigation';
 import { 
@@ -18,7 +19,7 @@ import {
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import MyPosts from '@/app/components/MyPosts';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '@/app/context/LanguageContext';
 
 interface UserProfile {
   username: string;
@@ -51,10 +52,11 @@ const AdminUserManager = dynamic(() => import('@/app/components/AdminUserManager
   loading: () => <div className="text-center py-10">加载用户管理组件中...</div>
 });
 
-export default function Profile() {
+export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [renderKey, setRenderKey] = useState(0);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -64,14 +66,17 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState<'info' | 'favorites' | 'history' | 'messages' | 'users' | 'my-posts'>('info');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [userPosts, setUserPosts] = useState([]);
+
+  // Force rerender when language changes
+  useEffect(() => {
+    setRenderKey(prevKey => prevKey + 1);
+  }, [language]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
     } else if (status === 'authenticated' && session?.user) {
       fetchUserProfile();
-      fetchUserPosts();
     }
   }, [status, session, router]);
 
@@ -99,19 +104,6 @@ export default function Profile() {
       setError(err instanceof Error ? err.message : '加载个人资料时出错');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchUserPosts = async () => {
-    try {
-      const response = await fetch('/api/community/posts/my-posts');
-      if (!response.ok) {
-        throw new Error(t('failed_to_fetch_posts'));
-      }
-      const data = await response.json();
-      setUserPosts(data || []);
-    } catch (err: any) {
-      setError(err.message);
     }
   };
 
@@ -173,7 +165,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div key={renderKey} className="min-h-screen bg-gray-50">
       <Navigation />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto space-y-6">
@@ -260,50 +252,11 @@ export default function Profile() {
             </div>
             
             <div className="p-6">
-              {userPosts.length === 0 ? (
-                <div className="text-center py-12">
-                  <ChatBubbleLeftRightIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">{t('no_posts_yet')}</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {userPosts.map((post: any) => (
-                    <div key={post._id} className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors duration-200">
-                      <h3 className="text-xl font-medium text-gray-900 mb-2">{post.title}</h3>
-                      <p className="text-gray-600 line-clamp-2 mb-4">{post.content}</p>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <CalendarIcon className="h-4 w-4" />
-                          {new Date(post.createdAt).toLocaleDateString()}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <ChatBubbleLeftRightIcon className="h-4 w-4" />
-                          {post.comments?.length || 0} {t('comments')}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <HeartIcon className="h-4 w-4" />
-                          {post.likes?.length || 0} {t('likes')}
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <button
-                          className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-                          onClick={() => router.push(`/community/post/${post._id}`)}
-                        >
-                          <EyeIcon className="h-4 w-4" />
-                          {t('view_post')}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <MyPosts />
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
-} 
   );
 } 

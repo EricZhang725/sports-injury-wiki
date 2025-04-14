@@ -249,112 +249,96 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-      </div>
-      
-      {/* 语言菜单（移动端） */}
-      {isLanguageMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg border-t border-gray-100 fade-in">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {supportedLanguages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => changeLanguage(lang.code)}
-                className={`block w-full text-left px-3 py-2 rounded-md text-base ${language === lang.code ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50'} transition-colors`}
-              >
-                <span className="mr-2">{lang.flag}</span>
-                <span>{lang.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* 移动端菜单 */}
-      <div className={`${isOpen ? 'block' : 'hidden'} md:hidden bg-white shadow-lg border-t border-gray-100 fade-in`}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          {navigationItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="block px-3 py-2 rounded-lg text-base text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              {item.name}
-            </Link>
-          ))}
-          
-          {session ? (
-            <>
-              <Link
-                href="/profile"
+        {/* 移动端菜单 */}
+        <div className={`${isOpen ? 'block' : 'hidden'} md:hidden`}>
+          <div className="pt-2 pb-3 space-y-1">
+            {navigationItems.map((item) => (
+              <Link 
+                key={item.name} 
+                href={item.href} 
                 className="block px-3 py-2 rounded-lg text-base text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
                 onClick={() => setIsOpen(false)}
               >
-                {t('profile')}
+                {item.name}
               </Link>
-              
-              {session.user?.role === 'admin' && (
-                <Link
-                  href="/admin"
+            ))}
+          </div>
+          
+          {/* 语言选择下拉菜单（移动端） */}
+          {isLanguageMenuOpen && (
+            <div className="pt-2 pb-3 border-t border-gray-200">
+              <div className="px-3 py-2 text-sm font-medium text-gray-500">
+                {t('language')}
+              </div>
+              {supportedLanguages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => changeLanguage(lang.code)}
+                  className={`block w-full text-left px-3 py-2 text-base ${language === lang.code ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:bg-gray-50'}`}
+                >
+                  <span className="mr-2 text-lg">{lang.flag}</span>
+                  <span>{lang.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          
+          {/* 用户菜单（移动端） */}
+          <div className="pt-4 pb-3 border-t border-gray-200">
+            <div className="px-3 py-2 text-sm font-medium text-gray-500">
+              {session ? `${session.user?.username || session.user?.email}` : t('login')}
+            </div>
+            
+            {session ? (
+              <>
+                <Link 
+                  href="/profile" 
                   className="block px-3 py-2 rounded-lg text-base text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
-                  {t('adminPanel')}
+                  {t('profile')}
                 </Link>
-              )}
-              
-              <button
-                onClick={() => {
-                  signOut();
-                  setIsOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 rounded-lg text-base text-red-600 hover:bg-red-50 transition-colors"
-              >
-                {t('logout')}
-              </button>
-            </>
-          ) : (
-            <div className="pt-2 pb-1 flex flex-col space-y-2">
-              <Link 
-                href="/login" 
-                className="btn btn-outline w-full justify-center"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('login')}
-              </Link>
-              <Link 
-                href="/register" 
-                className="btn btn-primary w-full justify-center"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('register')}
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
-} 
-            </>
-          ) : (
-            <div className="pt-2 pb-1 flex flex-col space-y-2">
-              <Link 
-                href="/login" 
-                className="btn btn-outline w-full justify-center"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('login')}
-              </Link>
-              <Link 
-                href="/register" 
-                className="btn btn-primary w-full justify-center"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('register')}
-              </Link>
-            </div>
-          )}
+                
+                {session.user?.role === 'admin' && (
+                  <Link 
+                    href="/admin" 
+                    className="block px-3 py-2 rounded-lg text-base text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {t('adminPanel')}
+                  </Link>
+                )}
+                
+                <button
+                  onClick={() => {
+                    signOut();
+                    setIsOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 rounded-lg text-base text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  {t('logout')}
+                </button>
+              </>
+            ) : (
+              <div className="pt-2 pb-1 flex flex-col space-y-2">
+                <Link 
+                  href="/login" 
+                  className="btn btn-outline w-full justify-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {t('login')}
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="btn btn-primary w-full justify-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {t('register')}
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>

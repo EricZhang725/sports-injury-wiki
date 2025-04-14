@@ -1,93 +1,118 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Navigation from '@/app/components/Navigation';
+import { useSession } from 'next-auth/react';
+import { PencilSquareIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useLanguage } from '@/app/context/LanguageContext';
+import Navigation from '@/app/components/Navigation';
 
-export default function NewPost() {
-  const { data: session } = useSession();
+export default function NewPostPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const { t, language } = useLanguage();
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    tags: '',
   });
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [renderKey, setRenderKey] = useState(0);
 
-  // 当语言变化时强制组件重新渲染
+  // Force rerender when language changes
   useEffect(() => {
     setRenderKey(prevKey => prevKey + 1);
   }, [language]);
+
+  useEffect(() => {
+    // Redirect if not authenticated
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session) {
-      router.push('/login');
-      return;
-    }
-
-    setLoading(true);
+    setIsLoading(true);
     setError('');
 
     try {
-      const tags = formData.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      // Validate form data
+      if (!formData.title.trim()) {
+        throw new Error(t('please_enter_title'));
+      }
       
+      if (!formData.content.trim()) {
+        throw new Error(t('please_enter_content'));
+      }
+
+      // Submit the post
       const response = await fetch('/api/community/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          title: formData.title,
-          content: formData.content,
-          tags,
-        }),
+        body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || t('publish_failed'));
+        throw new Error(data.error || t('failed_to_create_post'));
       }
 
-      router.push('/community');
+      // Navigate to the new post
+      router.push(`/community/post/${data._id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('publish_failed'));
+      console.error('Error creating post:', err);
+      setError(err instanceof Error ? err.message : t('unknown_error'));
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  if (status === 'loading') {
+    return (
+      <div>
+        <Navigation />
+        <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+          <div className="animate-pulse text-lg text-gray-600">{t('loading')}...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div key={renderKey} className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-200">
+    <div key={renderKey} className="min-h-screen bg-gray-50">
       <Navigation />
-      
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('publish_new_post')}</h1>
-
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r">
-              <p className="text-red-700">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="max-w-3xl mx-auto bg-white shadow rounded-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h1 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+              <PencilSquareIcon className="h-6 w-6 text-blue-600" />
+              {t('create_new_post')}
+            </h1>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {error && (
+              <div className="bg-red-50 text-red-800 p-4 rounded-md flex items-start">
+                <XMarkIcon className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+                <p>{error}</p>
+              </div>
+            )}
+            
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                {t('post_title')}
+                {t('post_title')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -95,50 +120,43 @@ export default function NewPost() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder={t('enter_post_title')}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder={t('post_title_placeholder')}
               />
             </div>
-
+            
             <div>
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
-                {t('post_content')}
+                {t('post_content')} <span className="text-red-500">*</span>
               </label>
               <textarea
                 id="content"
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
+                rows={8}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder={t('enter_post_content')}
                 required
-                rows={10}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder={t('post_content_placeholder')}
               />
             </div>
-
-            <div>
-              <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
-                {t('post_tags')}
-              </label>
-              <input
-                type="text"
-                id="tags"
-                name="tags"
-                value={formData.tags}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder={t('post_tags_placeholder')}
-              />
-            </div>
-
-            <div className="flex justify-end">
+            
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => router.push('/community')}
+                disabled={isLoading}
+              >
+                {t('cancel')}
+              </button>
               <button
                 type="submit"
-                disabled={loading}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={isLoading}
               >
-                {loading ? t('publishing') : t('publish')}
+                {isLoading ? `${t('creating')}...` : t('create_post')}
               </button>
             </div>
           </form>

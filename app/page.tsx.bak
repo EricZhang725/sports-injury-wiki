@@ -152,7 +152,7 @@ export default function Home() {
 
     setFilteredCards(filtered);
     setShowAllCards(false);
-  }
+  };
 
   // 当语言变化时重置搜索
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function Home() {
   // 翻译函数
   const tSearch = (key: string) => {
     return searchTranslations[key as keyof typeof searchTranslations]?.[language as keyof typeof searchTranslations[keyof typeof searchTranslations]] || key;
-  }
+  };
 
   // 获取卡片对应的背景颜色
   const getCardBackground = (category: string) => {
@@ -174,7 +174,7 @@ export default function Home() {
       case 'symptom': return 'from-blue-100 to-blue-50 shadow-blue-200/60';
       default: return 'from-gray-100 to-gray-50 shadow-gray-200/60';
     }
-  }
+  };
 
   // 获取卡片对应的图标颜色
   const getCardIconColor = (category: string) => {
@@ -185,7 +185,7 @@ export default function Home() {
       case 'symptom': return 'text-blue-600';
       default: return 'text-gray-600';
     }
-  }
+  };
   
   // 获取卡片对应的按钮颜色
   const getCardButtonColor = (category: string) => {
@@ -196,7 +196,7 @@ export default function Home() {
       case 'symptom': return 'bg-blue-600 hover:bg-blue-700';
       default: return 'bg-gray-600 hover:bg-gray-700';
     }
-  }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-gradient-to-b from-white to-gray-50">
@@ -332,4 +332,4 @@ export default function Home() {
       </div>
     </main>
   );
-}
+} 

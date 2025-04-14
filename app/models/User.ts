@@ -76,24 +76,3 @@ userSchema.index({ isActive: 1 });
 const User = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
 export default User; 
-  history: [{
-    type: mongoose.Schema.Types.Mixed,
-    default: []
-  }],
-  lastLogin: {
-    type: Date,
-    default: Date.now,
-  },
-}, {
-  timestamps: true,
-});
-
-// 只保留必要的索引
-userSchema.index({ 'history.viewedAt': -1 });
-userSchema.index({ role: 1 });
-userSchema.index({ isActive: 1 });
-
-// 避免重复模型定义
-const User = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
-
-export default User; 

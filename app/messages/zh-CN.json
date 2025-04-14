@@ -30,34 +30,3 @@
     "login": "登录失败，请检查您的用户名和密码。"
   }
 } 
-  "home": {
-    "title": "运动损伤百科",
-    "subtitle": "专业的运动损伤预防、治疗和康复知识平台",
-    "sections": {
-      "prevention": {
-        "title": "运动损伤预防",
-        "description": "了解如何通过正确的热身、训练技巧和装备使用来预防常见的运动损伤。"
-      },
-      "rehabilitation": {
-        "title": "专业康复指导",
-        "description": "获取专业的康复训练计划和建议，帮助您从运动损伤中恢复并重返运动场。"
-      }
-    },
-    "buttons": {
-      "community": "进入社区讨论",
-      "details": "查看详情"
-    }
-  },
-  "navigation": {
-    "home": "首页",
-    "community": "社区",
-    "profile": "个人中心",
-    "admin": "管理后台",
-    "login": "登录",
-    "register": "注册",
-    "logout": "退出登录"
-  },
-  "errors": {
-    "login": "登录失败，请检查您的用户名和密码。"
-  }
-} 
