@@ -1,0 +1,32 @@
+{
+  "common": {
+    "searchPlaceholder": "搜尋身體部位或損傷類型...",
+    "injuryTypes": "損傷類型",
+    "recoveryTime": "恢復時間",
+    "severity": {
+      "mild": "輕度",
+      "moderate": "中度",
+      "severe": "重度"
+    }
+  },
+  "header": {
+    "title": "運動損傷百科"
+  },
+  "bodyAreas": {
+    "head": "頭部",
+    "neck": "頸部",
+    "shoulder": "肩部",
+    "elbow": "肘部",
+    "wrist": "手腕",
+    "hand": "手部",
+    "chest": "胸部",
+    "abdomen": "腹部",
+    "back": "背部",
+    "hip": "髖部",
+    "thigh": "大腿",
+    "knee": "膝蓋",
+    "calf": "小腿",
+    "ankle": "腳踝",
+    "foot": "足部"
+  }
+} 
