@@ -4,6 +4,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import User from '@/app/models/User';
 import { dbConnect } from '@/app/lib/db';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }

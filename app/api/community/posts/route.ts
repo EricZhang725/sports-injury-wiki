@@ -5,6 +5,9 @@ import { dbConnect } from '@/app/lib/db';
 import Post from '@/app/models/Post';
 import User from '@/app/models/User';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);

@@ -5,6 +5,9 @@ import { dbConnect } from '@/app/lib/db';
 import Post from '@/app/models/Post';
 import mongoose from 'mongoose';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

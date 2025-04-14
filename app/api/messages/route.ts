@@ -4,6 +4,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { dbConnect } from '@/app/lib/db';
 import Message from '@/app/models/Message';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 // 获取所有消息 (仅管理员)
 export async function GET() {
   try {

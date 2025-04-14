@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { dbConnect } from '@/app/lib/db';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // 尝试连接数据库

@@ -3,6 +3,9 @@ import bcrypt from 'bcryptjs';
 import User from '@/app/models/User';
 import { dbConnect } from '@/app/lib/db';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 /**
  * 特殊的管理员注册API路由，用于调试目的
  * 注意：此路由仅用于开发测试，不应该在生产环境中使用

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { dbConnect } from '@/app/lib/db';
 import User from '@/app/models/User';
 import { getServerSession } from 'next-auth';
-import { dbConnect } from '@/app/lib/db';
+
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
 
 const ADMIN_CODE = process.env.ADMIN_INVITE_CODE || 'admin123';
 

@@ -5,6 +5,9 @@ import { dbConnect } from '@/app/lib/db';
 import User from '@/app/models/User';
 import type { AuthOptions } from 'next-auth';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 // 扩展 session 类型和用户类型
 declare module "next-auth" {
   interface Session {

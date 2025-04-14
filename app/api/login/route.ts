@@ -4,6 +4,9 @@ import User from '@/app/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-super-secret-key-here';
 
 export async function POST(request: NextRequest) {

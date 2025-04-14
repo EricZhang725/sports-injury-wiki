@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// 确保API路由为动态渲染
+export const dynamic = 'force-dynamic';
+
 // 这是一个不需要数据库连接的测试API，用于检查前端是否可以正确解析响应
 export async function POST(request: NextRequest) {
   console.log('测试注册API收到请求');

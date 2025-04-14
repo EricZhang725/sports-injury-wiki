@@ -16,13 +16,9 @@ const nextConfig = {
       },
     ];
   },
-  output: 'export',
   images: {
-    unoptimized: true,
     domains: ['localhost'],
   },
-  // 如果你的应用使用了动态路由，需要添加以下配置
-  trailingSlash: true,
   // 添加环境变量配置
   env: {
     MONGODB_URI: process.env.MONGODB_URI,
