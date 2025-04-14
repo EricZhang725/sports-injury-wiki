@@ -2,11 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['images.unsplash.com'],
-    unoptimized: process.env.NODE_ENV !== 'production'
-  },
-  // 适用于Vercel部署的输出配置
-  output: 'standalone'
+    domains: ['images.unsplash.com']
+  }
 };
 
 module.exports = nextConfig; 
